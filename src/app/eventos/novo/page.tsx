@@ -1,7 +1,18 @@
+import { redirect } from "next/navigation";
 import { criarEvento } from "./actions";
 import { NovoEventoForm } from "@/components/NovoEventoForm";
+import { createSupabaseServer } from "@/lib/supabase-server";
 
-export default function NovoEventoPage() {
+export default async function NovoEventoPage() {
+  const supabase = await createSupabaseServer();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/entrar?redirect=/eventos/novo");
+  }
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <div className="mb-8">

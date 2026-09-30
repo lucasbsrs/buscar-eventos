@@ -7,6 +7,16 @@ import type { TipoEvento } from "@/types/evento";
 export async function criarEvento(formData: FormData) {
   const supabase = await createSupabaseServer();
 
+  // Checagem independente da página: uma Server Action pode ser invocada
+  // diretamente, sem passar pelo redirect de /eventos/novo.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Você precisa entrar para cadastrar um evento." };
+  }
+
   const gratuito = formData.get("gratuito") === "true";
   const preco = formData.get("preco_entrada");
 
@@ -25,6 +35,7 @@ export async function criarEvento(formData: FormData) {
       site_url: (formData.get("site_url") as string) || null,
       gratuito,
       preco_entrada: gratuito ? null : Number(preco) || null,
+      criado_por: user.id,
     })
     .select("id")
     .single();
