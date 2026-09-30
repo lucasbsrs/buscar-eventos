@@ -1,10 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import type { Evento, FiltrosEvento } from "@/types/evento";
-import { ESTADOS_NOMES } from "@/types/evento";
-
-function normalizar(str: string): string {
-  return str.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
-}
+import type { Evento, FiltrosEvento, LocalizacaoSugestao } from "@/types/evento";
 
 export async function buscarEventos(filtros: FiltrosEvento = {}): Promise<Evento[]> {
   let query = supabase
@@ -13,23 +8,11 @@ export async function buscarEventos(filtros: FiltrosEvento = {}): Promise<Evento
     .eq("status", "publicado")
     .order("data_inicio", { ascending: true });
 
-  if (filtros.localizacao) {
-    const termo = filtros.localizacao.trim();
-    const termoNorm = normalizar(termo);
-
-    // Resolve nomes de estado sem acento para sigla (ex: "Sao Paulo" → "SP", "Minas" → "MG")
-    const siglasMatching = Object.entries(ESTADOS_NOMES)
-      .filter(([_, nome]) => normalizar(nome).includes(termoNorm))
-      .map(([sigla]) => sigla);
-
-    const conditions = [
-      // cidade_norm é a coluna gerada com lower(unaccent(cidade)) no banco
-      `cidade_norm.ilike.%${termoNorm}%`,
-      `estado.ilike.%${termoNorm}%`,
-      ...siglasMatching.map((sigla) => `estado.eq.${sigla}`),
-    ];
-
-    query = query.or(conditions.join(","));
+  if (filtros.cidade && filtros.estado) {
+    // Nomes de cidade se repetem entre estados, então cidade sempre vem junto do estado
+    query = query.eq("cidade", filtros.cidade).eq("estado", filtros.estado);
+  } else if (filtros.estado) {
+    query = query.eq("estado", filtros.estado);
   }
 
   if (filtros.tipo) {
@@ -59,6 +42,38 @@ export async function buscarEventos(filtros: FiltrosEvento = {}): Promise<Evento
   if (error) throw new Error(error.message);
 
   return data ?? [];
+}
+
+export async function listarLocalizacoesDisponiveis(): Promise<LocalizacaoSugestao[]> {
+  const { data, error } = await supabase
+    .from("eventos")
+    .select("cidade, estado")
+    .eq("status", "publicado");
+
+  if (error) throw new Error(error.message);
+
+  const estados = new Set<string>();
+  const cidades = new Map<string, { cidade: string; estado: string }>();
+
+  for (const { cidade, estado } of data ?? []) {
+    estados.add(estado);
+    cidades.set(`${cidade}|${estado}`, { cidade, estado });
+  }
+
+  const sugestoesEstados: LocalizacaoSugestao[] = Array.from(estados)
+    .sort()
+    .map((estado) => ({ tipo: "estado", estado, label: estado }));
+
+  const sugestoesCidades: LocalizacaoSugestao[] = Array.from(cidades.values())
+    .sort((a, b) => a.cidade.localeCompare(b.cidade))
+    .map(({ cidade, estado }) => ({
+      tipo: "cidade",
+      cidade,
+      estado,
+      label: `${cidade}, ${estado}`,
+    }));
+
+  return [...sugestoesEstados, ...sugestoesCidades];
 }
 
 export async function buscarEventosPorUsuario(userId: string): Promise<Evento[]> {

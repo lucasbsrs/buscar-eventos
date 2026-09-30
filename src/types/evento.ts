@@ -38,12 +38,17 @@ export interface Evento {
 }
 
 export interface FiltrosEvento {
-  localizacao?: string;
+  estado?: string;
+  cidade?: string;
   tipo?: TipoEvento | "";
   nome?: string;
   data_inicio?: string;
   data_fim?: string;
 }
+
+export type LocalizacaoSugestao =
+  | { tipo: "estado"; estado: string; label: string }
+  | { tipo: "cidade"; estado: string; cidade: string; label: string };
 
 export const TIPOS_EVENTO: Record<TipoEvento, string> = {
   anime: "Anime",

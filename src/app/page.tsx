@@ -1,11 +1,16 @@
 import { Suspense } from "react";
-import { buscarEventos } from "@/lib/db/eventos";
+import { buscarEventos, listarLocalizacoesDisponiveis } from "@/lib/db/eventos";
 import { EventCard } from "@/components/EventCard";
-import { EventFilters } from "@/components/EventFilters";
+import { EventFilters, EventFiltersSkeleton } from "@/components/EventFilters";
 import type { FiltrosEvento, TipoEvento } from "@/types/evento";
 
 interface HomeProps {
   searchParams: Promise<{ [key: string]: string | undefined }>;
+}
+
+async function FiltrosComLocalizacoes() {
+  const locations = await listarLocalizacoesDisponiveis();
+  return <EventFilters locations={locations} />;
 }
 
 async function ListaEventos({ filtros }: { filtros: FiltrosEvento }) {
@@ -34,7 +39,8 @@ export default async function Home({ searchParams }: HomeProps) {
   const params = await searchParams;
 
   const filtros: FiltrosEvento = {
-    localizacao: params.localizacao,
+    estado: params.estado,
+    cidade: params.cidade,
     tipo: params.tipo as TipoEvento | undefined,
     nome: params.nome,
     data_inicio: params.data_inicio,
@@ -71,8 +77,8 @@ export default async function Home({ searchParams }: HomeProps) {
       </section>
 
       <div className="max-w-7xl mx-auto w-full px-4 py-8 flex flex-col gap-6">
-        <Suspense>
-          <EventFilters />
+        <Suspense fallback={<EventFiltersSkeleton />}>
+          <FiltrosComLocalizacoes />
         </Suspense>
 
         <div>
