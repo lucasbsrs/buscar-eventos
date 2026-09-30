@@ -1,14 +1,17 @@
 import Link from "next/link";
-import { Sparkles, Plus, LogOut } from "lucide-react";
+import { Sparkles, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createSupabaseServer } from "@/lib/supabase-server";
-import { sair } from "@/lib/auth-actions";
+import { buscarPerfil, fotoExibida } from "@/lib/perfil";
+import { HeaderUserMenu } from "@/components/HeaderUserMenu";
 
 export async function Header() {
   const supabase = await createSupabaseServer();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  const perfil = user ? await buscarPerfil(user.id) : null;
 
   return (
     <header className="border-b bg-background/80 backdrop-blur-md sticky top-0 z-50">
@@ -31,17 +34,7 @@ export async function Header() {
           </Link>
 
           {user ? (
-            <div className="flex items-center gap-2">
-              <span className="hidden sm:inline text-sm text-muted-foreground max-w-40 truncate">
-                {user.email}
-              </span>
-              <form action={sair}>
-                <Button type="submit" variant="outline" size="sm" className="gap-1.5">
-                  <LogOut className="h-3.5 w-3.5" />
-                  Sair
-                </Button>
-              </form>
-            </div>
+            <HeaderUserMenu fotoUrl={fotoExibida(perfil, user)} email={user.email ?? ""} />
           ) : (
             <Link href="/entrar">
               <Button variant="outline" size="sm">

@@ -66,4 +66,4 @@ O sistema SHALL indicar de forma visível se há um usuário autenticado navegan
 
 #### Scenario: Usuário com sessão ativa
 - **WHEN** existe uma sessão autenticada ativa
-- **THEN** o site indica que o usuário está logado e oferece a ação de sair, no lugar da opção de entrar
+- **THEN** o site exibe a foto de perfil do usuário no lugar da opção de entrar, e ao clicar nela é possível escolher entre ir para a página de perfil ou sair
