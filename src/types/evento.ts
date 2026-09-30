@@ -8,6 +8,10 @@ export type TipoEvento =
   | "cultura-pop"
   | "outro";
 
+export type OrigemEvento = "manual" | "scraper";
+
+export type StatusEvento = "publicado" | "pendente_revisao" | "rejeitado";
+
 export interface Evento {
   id: string;
   nome: string;
@@ -24,6 +28,13 @@ export interface Evento {
   preco_entrada: number | null;
   gratuito: boolean;
   created_at: string;
+  origem: OrigemEvento;
+  fonte_nome: string | null;
+  fonte_url: string | null;
+  external_id: string | null;
+  status: StatusEvento;
+  confianca: number | null;
+  atualizado_em: string;
 }
 
 export interface FiltrosEvento {

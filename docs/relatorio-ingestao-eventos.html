@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Eventaku — Plano de Ingestão Automatizada</title>
+<style>
+  :root {
+    --bg: #f6f5f9;
+    --surface: #ffffff;
+    --surface-2: #edebf3;
+    --ink: #1c1730;
+    --ink-muted: #5b5470;
+    --ink-faint: #8983a1;
+    --border: #dedae8;
+    --border-strong: #c7c1d9;
+    --accent: #6d28d9;
+    --accent-ink: #4c1d95;
+    --accent-soft: #ede4fb;
+    --good: #15803d;
+    --good-soft: #dcfce7;
+    --good-border: #bbf0cf;
+    --warn: #b45309;
+    --warn-soft: #fef3c7;
+    --warn-border: #fbdf9d;
+    --planned: #55607a;
+    --planned-soft: #e5e7ee;
+    --planned-border: #d3d6e2;
+
+    --font-display: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+    --font-body: 'Source Sans 3', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14111f;
+      --surface: #1c1830;
+      --surface-2: #241f3b;
+      --ink: #ede9f9;
+      --ink-muted: #a79fc2;
+      --ink-faint: #756d90;
+      --border: #342c4d;
+      --border-strong: #453a63;
+      --accent: #b399f2;
+      --accent-ink: #d5c5fa;
+      --accent-soft: #2c2350;
+      --good: #4ade80;
+      --good-soft: #143324;
+      --good-border: #1e5236;
+      --warn: #fbbf24;
+      --warn-soft: #3a2a08;
+      --warn-border: #5c4110;
+      --planned: #a3aac2;
+      --planned-soft: #232640;
+      --planned-border: #343a56;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #14111f;
+    --surface: #1c1830;
+    --surface-2: #241f3b;
+    --ink: #ede9f9;
+    --ink-muted: #a79fc2;
+    --ink-faint: #756d90;
+    --border: #342c4d;
+    --border-strong: #453a63;
+    --accent: #b399f2;
+    --accent-ink: #d5c5fa;
+    --accent-soft: #2c2350;
+    --good: #4ade80;
+    --good-soft: #143324;
+    --good-border: #1e5236;
+    --warn: #fbbf24;
+    --warn-soft: #3a2a08;
+    --warn-border: #5c4110;
+    --planned: #a3aac2;
+    --planned-soft: #232640;
+    --planned-border: #343a56;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+    padding: 4rem 1.5rem 6rem;
+  }
+
+  .page {
+    max-width: 880px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 3.5rem;
+  }
+
+  /* ---------- Header ---------- */
+
+  .masthead {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 1.6rem;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    line-height: 1.15;
+    margin: 0;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+
+  .masthead p {
+    margin: 0;
+    max-width: 62ch;
+    color: var(--ink-muted);
+    font-size: 1.03rem;
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+  }
+
+  .meta-row strong {
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+
+  /* ---------- Sections ---------- */
+
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  .section-head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .section-num {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+  }
+
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.55rem;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  h3 {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 1rem;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  p { margin: 0; }
+
+  .lede {
+    max-width: 68ch;
+    color: var(--ink-muted);
+  }
+
+  /* ---------- Ask callout ---------- */
+
+  .ask {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 1.4rem 1.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+
+  .ask blockquote {
+    margin: 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.08rem;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  .ask .breakdown {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 0.4rem;
+  }
+
+  .ask .breakdown div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .ask .breakdown .label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+  }
+
+  .ask .breakdown .value {
+    font-size: 0.9rem;
+    color: var(--ink-muted);
+  }
+
+  @media (max-width: 620px) {
+    .ask .breakdown { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- Decisions ---------- */
+
+  .decisions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  @media (max-width: 700px) {
+    .decisions { grid-template-columns: 1fr; }
+  }
+
+  .decision-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.1rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .decision-card .q {
+    font-size: 0.76rem;
+    color: var(--ink-faint);
+  }
+
+  .decision-card .a {
+    font-weight: 700;
+    font-size: 0.98rem;
+    color: var(--ink);
+  }
+
+  .decision-card .why {
+    font-size: 0.86rem;
+    color: var(--ink-muted);
+  }
+
+  /* ---------- Architecture flow ---------- */
+
+  .flow {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .flow-step {
+    display: grid;
+    grid-template-columns: 2.4rem 1fr;
+    gap: 1rem;
+    padding: 1rem 1.3rem;
+    border-bottom: 1px solid var(--border);
+    align-items: start;
+  }
+
+  .flow-step:last-child { border-bottom: none; }
+
+  .flow-index {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+    border-radius: 5px;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .flow-body .name {
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .flow-body .desc {
+    font-size: 0.88rem;
+    color: var(--ink-muted);
+    margin-top: 0.15rem;
+  }
+
+  /* ---------- Phase list ---------- */
+
+  .phases {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .phase {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: 0;
+  }
+
+  .phase-rail {
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+
+  .phase-rail::before {
+    content: "";
+    position: absolute;
+    top: 2.6rem;
+    bottom: -1rem;
+    width: 1px;
+    background: var(--border-strong);
+  }
+
+  .phase:last-child .phase-rail::before { display: none; }
+
+  .phase-dot {
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+    flex-shrink: 0;
+  }
+
+  .phase.done .phase-dot {
+    background: var(--good-soft);
+    border-color: var(--good-border);
+    color: var(--good);
+  }
+
+  .phase.active .phase-dot {
+    background: var(--warn-soft);
+    border-color: var(--warn-border);
+    color: var(--warn);
+  }
+
+  .phase-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem 1.4rem 1.3rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .phase-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+  }
+
+  .phase-title {
+    font-weight: 700;
+    font-size: 1.02rem;
+    color: var(--ink);
+  }
+
+  .chip {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.22rem 0.6rem;
+    border-radius: 99px;
+    border: 1px solid transparent;
+    white-space: nowrap;
+  }
+
+  .chip.done { background: var(--good-soft); color: var(--good); border-color: var(--good-border); }
+  .chip.active { background: var(--warn-soft); color: var(--warn); border-color: var(--warn-border); }
+  .chip.planned { background: var(--planned-soft); color: var(--planned); border-color: var(--planned-border); }
+
+  .phase-desc {
+    font-size: 0.92rem;
+    color: var(--ink-muted);
+    margin-bottom: 0.7rem;
+  }
+
+  .task-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .task-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    font-size: 0.86rem;
+    color: var(--ink-muted);
+  }
+
+  .task-list .mark {
+    font-family: var(--font-mono);
+    flex-shrink: 0;
+    width: 1.1rem;
+    text-align: center;
+  }
+
+  .task-list li.ok .mark { color: var(--good); }
+  .task-list li.pending .mark { color: var(--warn); }
+  .task-list li.todo .mark { color: var(--ink-faint); }
+
+  .task-list code {
+    font-family: var(--font-mono);
+    font-size: 0.83rem;
+    background: var(--surface-2);
+    padding: 0.05rem 0.35rem;
+    border-radius: 4px;
+    color: var(--ink);
+  }
+
+  .phase-note {
+    margin-top: 0.8rem;
+    padding: 0.7rem 0.9rem;
+    background: var(--accent-soft);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: var(--accent-ink);
+  }
+
+  /* ---------- Schema table ---------- */
+
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.86rem;
+    min-width: 560px;
+  }
+
+  th {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+
+  td {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink-muted);
+    vertical-align: top;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  td.col-name {
+    font-family: var(--font-mono);
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  /* ---------- File list ---------- */
+
+  .files {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem 1.5rem;
+  }
+
+  @media (max-width: 620px) {
+    .files { grid-template-columns: 1fr; }
+  }
+
+  .file-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    font-size: 0.86rem;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .file-row code {
+    font-family: var(--font-mono);
+    color: var(--ink);
+    font-size: 0.83rem;
+  }
+
+  .file-row .tag {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    color: var(--ink-faint);
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  /* ---------- Next steps ---------- */
+
+  .next-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .next-step {
+    display: grid;
+    grid-template-columns: 1.7rem 1fr;
+    gap: 0.8rem;
+    padding: 0.85rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    font-size: 0.9rem;
+  }
+
+  .next-step.priority {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .next-step .n {
+    font-family: var(--font-mono);
+    color: var(--ink-faint);
+  }
+
+  .next-step.priority .n { color: var(--accent-ink); }
+
+  .next-step .body strong { color: var(--ink); }
+  .next-step .body { color: var(--ink-muted); }
+
+  /* ---------- Footer ---------- */
+
+  footer {
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--ink-faint);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  footer .plan-path {
+    font-family: var(--font-mono);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <div class="eyebrow">Relatório técnico · Eventaku</div>
+    <h1>Pipeline de ingestão automatizada de eventos otaku &amp; geek</h1>
+    <p>O que foi pedido nesta sessão e o plano de implementação aprovado, com o detalhamento de cada fase, o schema novo e o estado atual do trabalho.</p>
+    <div class="meta-row">
+      <span><strong>Projeto</strong> buscar-eventos / Eventaku</span>
+      <span><strong>Data</strong> 2026-08-09</span>
+      <span><strong>Plano</strong> esse-projeto-tem-como-agile-nest.md</span>
+      <span><strong>Status geral</strong> Fase 0 em conclusão</span>
+    </div>
+  </header>
+
+  <!-- 1. O PEDIDO -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">01 — O pedido</span>
+      <h2>Objetivo e escopo</h2>
+    </div>
+    <div class="ask">
+      <blockquote>
+        "Esse projeto tem como objetivo mapear os eventos otakus e geeks pelo Brasil (...) gostaria de alguma ideia de mapear de forma automatizada pelo máximo de eventos pelo Brasil. Também gostaria de pegar essas informações nos sites e colocar aqui na plataforma (...) e depois entrar nos links do site para fazer suas compras. Como isso poderia ser feito de forma automatizada sem muita intervenção humana?"
+      </blockquote>
+      <div class="breakdown">
+        <div>
+          <span class="label">Visão do produto</span>
+          <span class="value">Plataforma onde o usuário descobre o evento geek/otaku mais próximo dele, no Brasil inteiro.</span>
+        </div>
+        <div>
+          <span class="label">Pedido concreto</span>
+          <span class="value">Captar e extrair automaticamente dados de eventos em sites de terceiros e publicá-los no app.</span>
+        </div>
+        <div>
+          <span class="label">Restrição</span>
+          <span class="value">Mínima intervenção humana contínua — o usuário compra o ingresso no site original, não aqui.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. DECISÕES -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">02 — Decisões tomadas</span>
+      <h2>Três escolhas que moldam o desenho</h2>
+      <p class="lede">Confirmadas com você antes de escrever o plano final.</p>
+    </div>
+    <div class="decisions">
+      <div class="decision-card">
+        <span class="q">Fonte inicial de eventos</span>
+        <span class="a">Sites de convenções conhecidas</span>
+        <span class="why">Lista curada (Anime Friends, CCXP etc.) — alta precisão e baixa manutenção para o MVP, em vez de agregadores de categoria.</span>
+      </div>
+      <div class="decision-card">
+        <span class="q">Extração dos dados</span>
+        <span class="a">LLM + JSON-LD</span>
+        <span class="why">Tenta dados estruturados (schema.org) de graça primeiro; usa a API da Claude só quando não há — generaliza entre sites sem seletor por fonte.</span>
+      </div>
+      <div class="decision-card">
+        <span class="q">Agendamento do pipeline</span>
+        <span class="a">GitHub Actions</span>
+        <span class="why">Sem o limite de timeout das functions da Vercel; roda scripts Node comuns com secrets integrados.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. ARQUITETURA -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">03 — Arquitetura</span>
+      <h2>Do site de origem até a tabela <span style="font-family:var(--font-mono); font-size:1.1rem;">eventos</span></h2>
+    </div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-index">1</div>
+        <div class="flow-body">
+          <div class="name">seeds.json → discover.ts</div>
+          <div class="desc">Percorre a lista curada de sites de convenção e coleta URLs candidatas — uma por evento ou página de programação.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-index">2</div>
+        <div class="flow-body">
+          <div class="name">extract.ts</div>
+          <div class="desc">Procura JSON-LD (<code style="font-family:inherit">schema.org/Event</code>) na página; sem isso, limpa o HTML e envia à Claude API pedindo os campos estruturados e um score de confiança. Valida tudo com zod antes de seguir.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-index">3</div>
+        <div class="flow-body">
+          <div class="name">write.ts</div>
+          <div class="desc">Dedup por <code style="font-family:inherit">fonte_url</code> único + checagem fuzzy (nome + cidade + data). Grava via cliente admin (service role, ignora RLS). Confiança baixa vai para revisão em vez de publicar direto.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-index">4</div>
+        <div class="flow-body">
+          <div class="name">.github/workflows/ingest.yml</div>
+          <div class="desc">Dispara o pipeline em cron (diário/semanal) e sob demanda via <code style="font-family:inherit">workflow_dispatch</code>, com os secrets da service role e da API da Claude.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. FASES -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">04 — Plano por fases</span>
+      <h2>Do schema ao pipeline completo</h2>
+      <p class="lede">Cada fase depende da anterior estar validada — a ordem não é arbitrária.</p>
+    </div>
+
+    <div class="phases">
+
+      <div class="phase active">
+        <div class="phase-rail"><div class="phase-dot">0</div></div>
+        <div class="phase-card">
+          <div class="phase-top">
+            <span class="phase-title">Fase 0 — Schema e cliente admin</span>
+            <span class="chip active">Falta 1 passo</span>
+          </div>
+          <p class="phase-desc">Fundação: novas colunas de rastreamento de origem, filtro de status nas queries públicas, e um cliente Supabase isolado com a service role key (a anon key não tem permissão de insert/DDL).</p>
+          <ul class="task-list">
+            <li class="ok"><span class="mark">✓</span> Migration <code>supabase/migration_ingestion.sql</code> escrita — colunas <code>origem</code>, <code>fonte_nome</code>, <code>fonte_url</code>, <code>external_id</code>, <code>status</code>, <code>confianca</code>, <code>atualizado_em</code> + índices de dedup.</li>
+            <li class="ok"><span class="mark">✓</span> Tipos atualizados em <code>src/types/evento.ts</code>.</li>
+            <li class="ok"><span class="mark">✓</span> Filtro <code>status = 'publicado'</code> em <code>buscarEventos</code> e <code>buscarEventoPorId</code> (<code>src/lib/db/eventos.ts</code>).</li>
+            <li class="ok"><span class="mark">✓</span> Cliente admin criado em <code>scripts/ingest/lib/supabase-admin.ts</code>.</li>
+            <li class="ok"><span class="mark">✓</span> <code>SUPABASE_SERVICE_ROLE_KEY</code> e <code>ANTHROPIC_API_KEY</code> documentadas em <code>.env.local.example</code>.</li>
+            <li class="pending"><span class="mark">○</span> <strong style="color:var(--warn)">Pendente:</strong> rodar a migration no SQL Editor do Supabase — sem isso a home já foi testada e retorna <code>column eventos.status does not exist</code>.</li>
+          </ul>
+          <div class="phase-note">Motivo do bloqueio: só a anon key está disponível para os scripts atuais, e ela não tem permissão de DDL — a migration precisa ser executada manualmente com privilégio de owner.</div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-rail"><div class="phase-dot">1</div></div>
+        <div class="phase-card">
+          <div class="phase-top">
+            <span class="phase-title">Fase 1 — MVP, execução manual</span>
+            <span class="chip planned">Planejada</span>
+          </div>
+          <p class="phase-desc">Primeiro fluxo completo ponta a ponta, disparado à mão (<code>npm run ingest</code>), sem cron ainda — valida qualidade de extração e dedup contra dados reais antes de confiar sem supervisão.</p>
+          <ul class="task-list">
+            <li class="todo"><span class="mark">·</span> <code>scripts/ingest/sources/seeds.json</code> — lista de ~15 a 30 sites de convenção.</li>
+            <li class="todo"><span class="mark">·</span> <code>scripts/ingest/discover.ts</code> — coleta de URLs candidatas por site.</li>
+            <li class="todo"><span class="mark">·</span> <code>scripts/ingest/extract.ts</code> — JSON-LD → fallback Claude API → validação zod.</li>
+            <li class="todo"><span class="mark">·</span> <code>scripts/ingest/write.ts</code> — dedup + upsert via cliente admin.</li>
+            <li class="todo"><span class="mark">·</span> Novas dependências: <code>cheerio</code>, <code>zod</code>, <code>@anthropic-ai/sdk</code>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-rail"><div class="phase-dot">2</div></div>
+        <div class="phase-card">
+          <div class="phase-top">
+            <span class="phase-title">Fase 2 — Automação agendada</span>
+            <span class="chip planned">Planejada</span>
+          </div>
+          <p class="phase-desc">O mesmo pipeline da Fase 1, agora sem intervenção humana no dia a dia.</p>
+          <ul class="task-list">
+            <li class="todo"><span class="mark">·</span> <code>.github/workflows/ingest.yml</code> — cron diário/semanal + <code>workflow_dispatch</code> manual.</li>
+            <li class="todo"><span class="mark">·</span> Secrets no repositório: <code>SUPABASE_SERVICE_ROLE_KEY</code>, <code>ANTHROPIC_API_KEY</code>.</li>
+            <li class="todo"><span class="mark">·</span> Log do run (novos, atualizados, em revisão, erros) — falha precisa ser visível, não silenciosa.</li>
+            <li class="todo"><span class="mark">·</span> Rate limiting por domínio, respeito a <code>robots.txt</code>, cache por hash de conteúdo (evita reprocessar e reconsultar a IA à toa).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-rail"><div class="phase-dot">3</div></div>
+        <div class="phase-card">
+          <div class="phase-top">
+            <span class="phase-title">Fase 3 — Ampliar fontes</span>
+            <span class="chip planned">Planejada</span>
+          </div>
+          <p class="phase-desc">Só depois de validar as fases 1 e 2 com dados reais.</p>
+          <ul class="task-list">
+            <li class="todo"><span class="mark">·</span> Incluir agregadores por categoria (Sympla, Ingresso.com, Disk Ingressos) como fonte de descoberta de eventos novos, não só a lista curada.</li>
+            <li class="todo"><span class="mark">·</span> Checar os termos de uso de cada site antes de incluir — maior volume, maior atenção necessária.</li>
+            <li class="todo"><span class="mark">·</span> Recalibrar o limiar de confiança com base na taxa real de falso positivo/negativo observada.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-rail"><div class="phase-dot">4</div></div>
+        <div class="phase-card">
+          <div class="phase-top">
+            <span class="phase-title">Fase 4 — Fila de revisão</span>
+            <span class="chip planned">Opcional</span>
+          </div>
+          <p class="phase-desc">Só vale a pena construir se a fila de <code>pendente_revisao</code> acumular volume relevante nas fases anteriores.</p>
+          <ul class="task-list">
+            <li class="todo"><span class="mark">·</span> Página <code>/admin/revisao</code> listando eventos pendentes, com aprovar/rejeitar.</li>
+            <li class="todo"><span class="mark">·</span> Precisa de controle de acesso — hoje o sistema de auth do app está removido, então depende de um stopgap (senha via env) ou de restaurar o auth antes.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 5. SCHEMA -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">05 — Schema novo</span>
+      <h2>Colunas adicionadas em <span style="font-family:var(--font-mono); font-size:1.15rem;">eventos</span></h2>
+      <p class="lede">Todas aditivas e opcionais/padrão preenchido — nenhuma quebra o comportamento atual de cadastro manual.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Coluna</th><th>Tipo</th><th>Para quê</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="col-name">origem</td><td>text, padrão <code style="font-family:inherit">'manual'</code></td><td>Distingue evento cadastrado por pessoa de evento capturado pelo scraper.</td></tr>
+          <tr><td class="col-name">fonte_nome</td><td>text, opcional</td><td>Nome legível da fonte (ex. "sympla", "anime_friends_site").</td></tr>
+          <tr><td class="col-name">fonte_url</td><td>text, opcional, único</td><td>URL canônica da página de origem — chave de dedup principal.</td></tr>
+          <tr><td class="col-name">external_id</td><td>text, opcional</td><td>ID do evento na fonte original, quando disponível.</td></tr>
+          <tr><td class="col-name">status</td><td>text, padrão <code style="font-family:inherit">'publicado'</code></td><td>publicado / pendente_revisao / rejeitado — controla o que aparece publicamente.</td></tr>
+          <tr><td class="col-name">confianca</td><td>numeric(3,2), opcional</td><td>Score 0–1 da extração via LLM; abaixo do limiar vai para revisão.</td></tr>
+          <tr><td class="col-name">atualizado_em</td><td>timestamptz</td><td>Marca re-sincronizações do pipeline sobre o mesmo evento.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 6. ARQUIVOS -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">06 — Arquivos críticos</span>
+      <h2>Onde cada parte do plano vive</h2>
+    </div>
+    <div class="files">
+      <div class="file-row"><code>supabase/migration_ingestion.sql</code><span class="tag">criado</span></div>
+      <div class="file-row"><code>src/types/evento.ts</code><span class="tag">alterado</span></div>
+      <div class="file-row"><code>src/lib/db/eventos.ts</code><span class="tag">alterado</span></div>
+      <div class="file-row"><code>scripts/ingest/lib/supabase-admin.ts</code><span class="tag">criado</span></div>
+      <div class="file-row"><code>.env.local.example</code><span class="tag">alterado</span></div>
+      <div class="file-row"><code>scripts/ingest/sources/seeds.json</code><span class="tag">fase 1</span></div>
+      <div class="file-row"><code>scripts/ingest/discover.ts</code><span class="tag">fase 1</span></div>
+      <div class="file-row"><code>scripts/ingest/extract.ts</code><span class="tag">fase 1</span></div>
+      <div class="file-row"><code>scripts/ingest/write.ts</code><span class="tag">fase 1</span></div>
+      <div class="file-row"><code>.github/workflows/ingest.yml</code><span class="tag">fase 2</span></div>
+    </div>
+  </section>
+
+  <!-- 7. PRÓXIMOS PASSOS -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">07 — Próximos passos</span>
+      <h2>Verificação e sequência</h2>
+    </div>
+    <div class="next-steps">
+      <div class="next-step priority">
+        <span class="n">→</span>
+        <span class="body"><strong>Agora:</strong> rodar <code style="font-family:var(--font-mono)">supabase/migration_ingestion.sql</code> no SQL Editor do Supabase para destravar a Fase 0.</span>
+      </div>
+      <div class="next-step">
+        <span class="n">1</span>
+        <span class="body">Confirmar as colunas novas via <code style="font-family:var(--font-mono)">information_schema.columns</code> e testar a home — eventos <code style="font-family:var(--font-mono)">pendente_revisao</code> não devem aparecer.</span>
+      </div>
+      <div class="next-step">
+        <span class="n">2</span>
+        <span class="body">Curar a lista inicial de sites de convenção para <code style="font-family:var(--font-mono)">seeds.json</code> e decidir orçamento mensal da API da Claude.</span>
+      </div>
+      <div class="next-step">
+        <span class="n">3</span>
+        <span class="body">Construir discover → extract → write da Fase 1 e rodar manualmente contra 1–2 fontes antes de confiar no resultado.</span>
+      </div>
+      <div class="next-step">
+        <span class="n">4</span>
+        <span class="body">Rodar de novo sem mudar as fontes para confirmar que o dedup por <code style="font-family:var(--font-mono)">fonte_url</code> evita duplicatas antes de agendar no GitHub Actions.</span>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Eventaku — relatório gerado a partir da sessão de implementação</span>
+    <span class="plan-path">~/.claude/plans/esse-projeto-tem-como-agile-nest.md</span>
+  </footer>
+
+</div>
+</body>
+</html>

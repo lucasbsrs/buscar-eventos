@@ -10,6 +10,7 @@ export async function buscarEventos(filtros: FiltrosEvento = {}): Promise<Evento
   let query = supabase
     .from("eventos")
     .select("*")
+    .eq("status", "publicado")
     .order("data_inicio", { ascending: true });
 
   if (filtros.localizacao) {
@@ -77,6 +78,7 @@ export async function buscarEventoPorId(id: string): Promise<Evento | null> {
     .from("eventos")
     .select("*")
     .eq("id", id)
+    .eq("status", "publicado")
     .single();
 
   if (error) return null;

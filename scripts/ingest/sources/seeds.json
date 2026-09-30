@@ -1,0 +1,34 @@
+[
+  {
+    "id": "doity_anima_jeek",
+    "nome": "Anima Jeek Festival",
+    "tipo": "evento_unico",
+    "tipo_padrao": "anime",
+    "homepage_url": "https://doity.com.br/anima-jeek-festival",
+    "pagina_evento_url": "https://doity.com.br/anima-jeek-festival"
+  },
+  {
+    "id": "doity_festiva_nerd",
+    "nome": "Festiva Nerd",
+    "tipo": "evento_unico",
+    "tipo_padrao": "cultura-pop",
+    "homepage_url": "https://doity.com.br/festiva-nerd-9-ed",
+    "pagina_evento_url": "https://doity.com.br/festiva-nerd-9-ed"
+  },
+  {
+    "id": "ccxp",
+    "nome": "CCXP - Comic Con Experience",
+    "tipo": "evento_unico",
+    "tipo_padrao": "cultura-pop",
+    "homepage_url": "https://www.ccxp.com.br/",
+    "pagina_evento_url": "https://www.ccxp.com.br/"
+  },
+  {
+    "id": "bgs",
+    "nome": "Brasil Game Show",
+    "tipo": "evento_unico",
+    "tipo_padrao": "games",
+    "homepage_url": "https://www.brasilgameshow.com.br/",
+    "pagina_evento_url": "https://www.brasilgameshow.com.br/"
+  }
+]

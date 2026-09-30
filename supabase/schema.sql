@@ -57,8 +57,8 @@ create policy "eventos_delete_owner"
 -- =============================================
 -- Dados de exemplo (execute apenas em dev)
 -- =============================================
-insert into eventos (nome, descricao, tipo, data_inicio, data_fim, cidade, estado, local, endereco, gratuito) values
-  ('Anime Friends 2026', 'O maior festival de cultura japonesa do Brasil.', 'anime', '2026-07-10', '2026-07-13', 'São Paulo', 'SP', 'Expo Center Norte', 'R. José Bernardo Pinto, 333', false),
-  ('Comic Con Experience 2026', 'O evento de cultura pop mais aguardado do ano.', 'cultura-pop', '2026-12-04', '2026-12-07', 'São Paulo', 'SP', 'São Paulo Expo', 'Rod. dos Imigrantes, km 1,5', false),
-  ('GamesWeek BH', 'Festival de games e e-sports em Belo Horizonte.', 'games', '2026-08-22', '2026-08-24', 'Belo Horizonte', 'MG', 'Expominas', 'Av. Amazonas, 6200', true),
-  ('RPGCon Rio', 'Convenção dedicada a RPG de mesa e board games.', 'rpg', '2026-09-05', '2026-09-07', 'Rio de Janeiro', 'RJ', 'Museu do Amanhã', 'Praça Mauá, 1', true);
+insert into eventos (nome, descricao, tipo, data_inicio, data_fim, cidade, estado, local, endereco, imagem_url, site_url, gratuito) values
+  ('Anime Friends 2026', 'O maior festival de cultura japonesa do Brasil, realizado no Distrito Anhembi em São Paulo. Música, cosplay, cultura pop japonesa e muito mais.', 'anime', '2026-07-02', '2026-07-05', 'São Paulo', 'SP', 'Distrito Anhembi', 'Av. Olavo Fontoura, 1209 - Santana', 'https://animefriends.com.br/wp-content/uploads/2026/02/anime_friends26-logo-chamada.svg', 'https://animefriends.com.br/', false),
+  ('Comic Con Experience 2026', 'O evento de cultura pop mais aguardado do ano.', 'cultura-pop', '2026-12-04', '2026-12-07', 'São Paulo', 'SP', 'São Paulo Expo', 'Rod. dos Imigrantes, km 1,5', null, null, false),
+  ('GamesWeek BH', 'Festival de games e e-sports em Belo Horizonte.', 'games', '2026-08-22', '2026-08-24', 'Belo Horizonte', 'MG', 'Expominas', 'Av. Amazonas, 6200', null, null, true),
+  ('RPGCon Rio', 'Convenção dedicada a RPG de mesa e board games.', 'rpg', '2026-09-05', '2026-09-07', 'Rio de Janeiro', 'RJ', 'Museu do Amanhã', 'Praça Mauá, 1', null, null, true);
